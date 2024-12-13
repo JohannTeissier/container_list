@@ -11,7 +11,7 @@ namespace pw
     }
 
 template <typename T>
-inline Element<T>::Element(T val, Element<T> *next, Element<T> *prev)
+inline Element<T>::Element(const T &val, Element<T> *next, Element<T> *prev)
 {
     this->__value = val;
     this->__pprev = prev;
@@ -21,7 +21,7 @@ inline Element<T>::Element(T val, Element<T> *next, Element<T> *prev)
 template <typename T>
 inline Element<T>::Element(const Element<T> &elem)
 {
-    this->__value = elem.__value;
+    this->__value = T{elem.__value};
     this->__pprev = nullptr;
     this->__pnext = nullptr;
 }
@@ -29,8 +29,8 @@ inline Element<T>::Element(const Element<T> &elem)
 template <typename T>
 inline Element<T>::~Element()
 {
-    if(this->__destroy)
-        std::cout << "Object deleted." << std::endl;
+    // if(this->__destroy)
+        // std::cout << "Object deleted." << std::endl;
 }
 
 template <typename T>
@@ -314,15 +314,39 @@ inline void List<U>::print_list()
 }
 
 template <typename U>
+inline List<U>::List(const List<U> &l)
+{
+    if(this->__last != nullptr && this->__first != nullptr)
+        this->clear();
+
+    Element<U> *temp = l.__last;
+
+    while(temp != nullptr)
+    {
+        this->push_front(temp->get_copy_val());
+        temp = temp->get_prev();
+    }
+
+    //this->__destroy = false;
+}
+
+template <typename U>
 inline List<U>::~List()
 {
-    if(!this->__empty)
+    if(!this->__empty && this->__destroy)
     {
+        // std::cout << "List : \n[\n";
+        // this->print_list();
+        // std::cout << "]" << std::endl;
+        // std::cout << "List deleted." << std::endl;
         while(!this->__empty)
             this->pop_back();
     }
     else
-        std::cout << "Nothing to delete." << std::endl;
+        // std::cout << "Nothing to delete." << std::endl;
+
+    if(this->__destroy == false)
+        this->__destroy = true;
 }
 
 template <typename U>
@@ -332,7 +356,7 @@ inline int List<U>::get_cardinal() const
 }
 
 template <typename U>
-inline void List<U>::push_front(const U val)
+inline void List<U>::push_front(const U &val)
 {
     Element<U> *temp = new Element<U>{val};
 
@@ -356,7 +380,7 @@ inline void List<U>::push_front(const U val)
 }
 
 template <typename U>
-inline void List<U>::push_back(const U val)
+inline void List<U>::push_back(const U &val)
 {
     Element<U> *temp = new Element<U>{val};
 
@@ -380,7 +404,7 @@ inline void List<U>::push_back(const U val)
 }
 
 template <typename U>
-inline void List<U>::push(size_t index, U val)
+inline void List<U>::push(size_t index, const U &val)
 {
     if(index < 0 || index > this->__cardinal)
     {
@@ -516,6 +540,64 @@ inline void List<U>::pop(size_t index)
     delete temp;
 
     this->__cardinal--;
+}
+
+template <typename U>
+inline void List<U>::clear()
+{
+    while(!this->__empty)
+        this->pop_back();
+}
+
+template <typename U>
+inline void List<U>::operator=(const List<U> &other)
+{
+    if(this->__last != nullptr && this->__first != nullptr)
+        this->clear();
+
+    Element<U> *temp = other.__last;
+
+    while(temp != nullptr)
+    {
+        this->push_front(temp->get_copy_val());
+        temp = temp->get_prev();
+    }
+}
+
+template <typename U>
+inline U &List<U>::operator[](size_t index)
+{
+    if(index < 0 || index > this->__cardinal)
+    {
+        std::cout << "ERROR:: The index is out of the range." << std::endl;
+        return this->__first->get_ref_val();
+    }
+
+    if(index == 0)
+    {
+        return this->__first->get_ref_val();
+    }
+    if(index == this->__cardinal - 1)
+    {
+        return this->__last->get_ref_val();
+    }
+
+    Element<U> *temp;
+
+    if(index < this->__cardinal / 2)
+    {
+        temp = this->__first;
+        for(int  i = 0; i < index; i++)
+            temp = temp->get_next();
+    }
+    else
+    {
+        temp = this->__last;
+        for(int i = 0; i < this->__cardinal - index - 1; i++)
+            temp = temp->get_prev();
+    }
+
+    return temp->get_ref_val();
 }
 
 } // namespace pw

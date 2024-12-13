@@ -14,7 +14,7 @@ public:
     void print_value() const;
 
     /*------------------ Constructor ------------------*/
-    Element(T val, Element<T>* next = nullptr, Element<T>* prev = nullptr);
+    Element(const T &val, Element<T>* next = nullptr, Element<T>* prev = nullptr);
     Element(const Element<T>& elem);
 
     /*------------------ Destructor ------------------*/
@@ -91,6 +91,7 @@ public:
 
     /*------------ Constructor ------------*/
     List() = default;
+    List(const List<U>& l);
 
     /*------------ Destructor ------------*/
     ~List();
@@ -99,14 +100,36 @@ public:
     int get_cardinal() const;
 
     /*------------ Push functions ------------*/
-    void push_front(const U val);
-    void push_back(const U val);
-    void push(size_t index, U val);
+    void push_front(const U &val);
+    void push_back(const U &val);
+    void push(size_t index, const U &val);
 
     /*------------ Pop functions ------------*/
     void pop_front();
     void pop_back();
     void pop(size_t index);
+
+    void clear();
+
+    void operator =(const List<U>& other);
+    U& operator [](size_t index);
+
+    friend std::ostream& operator <<(std::ostream& os, List<U>& elem)
+    {
+        Element<U> *temp = elem.__first;
+
+        os << "-[";
+
+        while(temp != nullptr)
+        {
+            os << temp->get_ref_val();
+            temp = temp->get_next();
+        }
+
+        os << "]-";
+
+        return os;
+    }
 
 private:
 
@@ -114,6 +137,7 @@ private:
     Element<U>* __last = nullptr;
     int __cardinal = 0;
     bool __empty = true;
+    bool __destroy = true;
 };
 
 

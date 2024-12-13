@@ -4,25 +4,20 @@
 
 int main()
 {
-    pw::List<int> l;
+    pw::List<pw::List<int>> l;
+    pw::List<int> temp;
 
-    l.push_back(1);
-    l.push_back(2);
-    l.push_back(3);
-    l.push_back(4);
-    l.push_back(5);
-    l.push_back(6);
-    l.push_back(7);
+    temp.push_back(1);
+    temp.push_back(2);
+    temp.push_back(3);
 
-    l.push(5, 13);
+    l.push_back(temp);
+    temp.push(1, 1);
+    temp[1] = 9;
+    l.push_back(temp);
+    temp[3] = 2;
 
-    l.print_list();
-
-    l.pop(2);
-
-    l.print_list();
-
-    std::cout << "Cardinal : " << l.get_cardinal() << std::endl;
+    std::cout << l[0][1] << std::endl;
 
     return 0;
 }
