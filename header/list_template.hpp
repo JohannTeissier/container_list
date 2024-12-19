@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <initializer_list>
 
 namespace pw
 {
@@ -92,6 +93,7 @@ public:
     /*------------ Constructor ------------*/
     List() = default;
     List(const List<U>& l);
+    List(std::initializer_list<U> list);
 
     /*------------ Destructor ------------*/
     ~List();
@@ -112,6 +114,7 @@ public:
     void clear();
 
     void operator =(const List<U>& other);
+    void operator =(std::initializer_list<U> list);
     U& operator [](size_t index);
 
     friend std::ostream& operator <<(std::ostream& os, List<U>& elem)
@@ -124,6 +127,9 @@ public:
         {
             os << temp->get_ref_val();
             temp = temp->get_next();
+
+            if(temp != nullptr)
+                os << " ";
         }
 
         os << "]-";

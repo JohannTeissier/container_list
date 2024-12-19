@@ -331,6 +331,13 @@ inline List<U>::List(const List<U> &l)
 }
 
 template <typename U>
+inline List<U>::List(std::initializer_list<U> list)
+{
+    for(auto &elem : list)
+        push_back(elem);
+}
+
+template <typename U>
 inline List<U>::~List()
 {
     if(!this->__empty && this->__destroy)
@@ -562,6 +569,15 @@ inline void List<U>::operator=(const List<U> &other)
         this->push_front(temp->get_copy_val());
         temp = temp->get_prev();
     }
+}
+
+template <typename U>
+inline void List<U>::operator=(std::initializer_list<U> list)
+{
+    this->clear();
+
+    for(auto &elem : list)
+        this->push_back(elem);
 }
 
 template <typename U>
