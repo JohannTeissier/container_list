@@ -4,16 +4,11 @@
 
 namespace pw
 {
-    template <typename T>
-    inline void Element<T>::print_value() const
-    {
-        std::cout << this->__value << std::endl;
-    }
 
 template <typename T>
 inline Element<T>::Element(const T &val, Element<T> *next, Element<T> *prev)
 {
-    this->__value = val;
+    this->__p_val = new T{val};
     this->__pprev = prev;
     this->__pnext = next;
 }
@@ -21,28 +16,46 @@ inline Element<T>::Element(const T &val, Element<T> *next, Element<T> *prev)
 template <typename T>
 inline Element<T>::Element(const Element<T> &elem)
 {
-    this->__value = T{elem.__value};
+    this->__p_val = new T{*elem.__p_val};
+
     this->__pprev = nullptr;
     this->__pnext = nullptr;
 }
 
 template <typename T>
+inline Element<T>::Element(T *val)
+{
+    this->__p_val = val;
+    this->__is_ref = true;
+}
+
+template <typename T>
 inline Element<T>::~Element()
 {
-    // if(this->__destroy)
-    //     std::cout << "Object deleted." << std::endl;
+    if(this->__destroy && !this->__is_ref)
+    {
+        //std::cout << "Object deleted." << std::endl;
+        if(this->__p_val != nullptr)
+            delete this->__p_val;
+    }
 }
 
 template <typename T>
 inline T &Element<T>::get_ref_val()
 {
-    return this->__value;
+    return *this->__p_val;
 }
 
 template <typename T>
-inline T Element<T>::get_copy_val() const
+inline T Element<T>::get_copy_val()
 {
-    return this->__value;
+    return *this->__p_val;
+}
+
+template <typename T>
+inline T *Element<T>::ref_get_val()
+{
+    return this->__p_val;
 }
 
 template <typename T>
@@ -66,7 +79,34 @@ inline Element<T> *Element<T>::data() const
 template <typename T>
 inline void Element<T>::set_value(const T val)
 {
-    this->__value = val;
+    *this->__p_val = val;
+}
+
+template <typename T>
+inline void Element<T>::set_ref(T *val)
+{
+    if(!this->__is_ref)
+        delete this->__p_val;
+
+    this->__p_val = val;
+    this->__is_ref = true;
+}
+
+template <typename T>
+inline void Element<T>::free_ref(T val)
+{
+    if(this->__is_ref)
+    {
+        this->__is_ref = false;
+        this->__p_val = new T{val};
+    }
+}
+
+template <typename T>
+inline void Element<T>::free_ref(T *val)
+{
+    if(this->__is_ref)
+        this->__p_val = val;
 }
 
 template <typename T>
@@ -84,19 +124,25 @@ inline void Element<T>::set_next(Element<T> *next)
 template <typename T>
 inline void Element<T>::operator=(const Element<T> &elem)
 {
-    this->__value = elem.__value;
+    if(this->__p_val != nullptr)
+        *this->__p_val = *elem.__p_val;
+    else
+        this->__p_val = new T{*elem.__p_val};
 }
 
 template <typename T>
 inline void Element<T>::operator=(const T val)
 {
-    this->__value = val;
+    if(this->__p_val != nullptr)
+        *this->__p_val = val;
+    else
+        this->__p_val = new T{val};
 }
 
 template <typename T>
 inline Element<T> Element<T>::operator*(const Element<T> &elem)
 {
-    Element<T> temp = Element<T>{this->__value * elem.__value};
+    Element<T> temp = Element<T>{this->get_ref_val() * elem.get_ref_val()};
     temp.__destroy = false;
 
     return temp;
@@ -105,7 +151,7 @@ inline Element<T> Element<T>::operator*(const Element<T> &elem)
 template <typename T>
 inline Element<T> Element<T>::operator+(const Element<T> &elem)
 {
-    Element<T> temp = Element<T>{this->__value + elem.__value};
+    Element<T> temp = Element<T>{this->get_ref_val() + elem.get_ref_val()};
     temp.__destroy = false;
 
     return temp;
@@ -114,7 +160,7 @@ inline Element<T> Element<T>::operator+(const Element<T> &elem)
 template <typename T>
 inline Element<T> Element<T>::operator-(const Element<T> &elem)
 {
-    Element<T> temp = Element<T>{this->__value - elem.__value};
+    Element<T> temp = Element<T>{this->get_ref_val() - elem.get_ref_val()};
     temp.__destroy = false;
 
     return temp;
@@ -123,7 +169,7 @@ inline Element<T> Element<T>::operator-(const Element<T> &elem)
 template <typename T>
 inline Element<T> Element<T>::operator/(const Element<T> &elem)
 {
-    Element<T> temp = Element<T>{this->__value / elem.__value};
+    Element<T> temp = Element<T>{this->get_ref_val() / elem.get_ref_val()};
     temp.__destroy = false;
 
     return temp;
@@ -132,55 +178,55 @@ inline Element<T> Element<T>::operator/(const Element<T> &elem)
 template <typename T>
 inline void Element<T>::operator+=(const Element<T> &elem)
 {
-    this->__value += elem.__value;
+    this->get_ref_val() += elem.get_ref_val();
 }
 
 template <typename T>
 inline void Element<T>::operator+=(const T val)
 {
-    this->__value += val;
+    this->get_ref_val() += val;
 }
 
 template <typename T>
 inline void Element<T>::operator-=(const Element<T> &elem)
 {
-    this->__value -= elem.__value;
+    this->get_ref_val() -= elem.get_ref_val();
 }
 
 template <typename T>
 inline void Element<T>::operator-=(const T val)
 {
-    this->__value -= val;
+    this->get_ref_val() -= val;
 }
 
 template <typename T>
 inline void Element<T>::operator*=(const Element<T> &elem)
 {
-    this->__value *= elem.__value;
+    this->get_ref_val *= elem.get_ref_val();
 }
 
 template <typename T>
 inline void Element<T>::operator*=(const T val)
 {
-    this->__value *= val;
+    this->get_ref_val() *= val;
 }
 
 template <typename T>
 inline void Element<T>::operator/=(const Element<T> &elem)
 {
-    this->__value /= elem.__value;
+    this->get_ref_val() /= elem.get_ref_val();
 }
 
 template <typename T>
 inline void Element<T>::operator/=(const T val)
 {
-    this->__value /= val;
+    this->get_ref_val() /= val;
 }
 
 template <typename T>
 inline bool Element<T>::operator==(const Element<T> &elem)
 {
-    if(this->__value == elem.__value)
+    if(this->get_ref_val() == elem.get_ref_val())
         return true;
 
     return false;
@@ -189,7 +235,7 @@ inline bool Element<T>::operator==(const Element<T> &elem)
 template <typename T>
 inline bool Element<T>::operator==(const T val)
 {
-    if(this->__value == val)
+    if(this->get_ref_val() == val)
         return true;
 
     return false;
@@ -210,7 +256,7 @@ inline bool Element<T>::operator!=(const T val)
 template <typename T>
 inline bool Element<T>::operator<=(const Element<T> &elem)
 {
-    if(this->__value <= elem.__value)
+    if(this->get_ref_val() <= elem.get_ref_val())
         return true;
 
     return false;
@@ -219,7 +265,7 @@ inline bool Element<T>::operator<=(const Element<T> &elem)
 template <typename T>
 inline bool Element<T>::operator<=(const T val)
 {
-    if(this->__value <= val)
+    if(this->get_ref_val() <= val)
         return true;
 
     return false;
@@ -228,7 +274,7 @@ inline bool Element<T>::operator<=(const T val)
 template <typename T>
 inline bool Element<T>::operator>=(const Element<T> &elem)
 {
-    if(this->__value >= elem.__value)
+    if(this->get_ref_val() >= elem.get_ref_val())
         return true;
 
     return false;
@@ -237,7 +283,7 @@ inline bool Element<T>::operator>=(const Element<T> &elem)
 template <typename T>
 inline bool Element<T>::operator>=(const T val)
 {
-    if(this->__value >= val)
+    if(this->get_ref_val() >= val)
         return true;
 
     return false;
@@ -270,31 +316,31 @@ inline bool Element<T>::operator>(const T val)
 template <typename T>
 inline bool Element<T>::operator&&(const Element<T> &elem)
 {
-    return (this->__value && elem.__value);
+    return (this->get_ref_val() && elem.get_ref_val());
 }
 
 template <typename T>
 inline bool Element<T>::operator&&(const T val)
 {
-    return (this->__value && val);
+    return (this->get_ref_val() && val);
 }
 
 template <typename T>
 inline bool Element<T>::operator||(const Element<T> &elem)
 {
-    return (this->__value || elem.__value);
+    return (this->get_ref_val() || elem.get_ref_val());
 }
 
 template <typename T>
 inline bool Element<T>::operator||(const T val)
 {
-    return (this->__value || val);
+    return (this->get_ref_val() || val);
 }
 
 template <typename T>
-inline Element<T>::operator T() const
+inline Element<T>::operator T()
 {
-    return this->__value;
+    return this->get_copy_val();
 }
 
 /*----------------------------------------------------------------------------*/
@@ -349,17 +395,60 @@ inline List<U>::~List()
         while(!this->__empty)
             this->pop_back();
     }
-    else
-        // std::cout << "Nothing to delete." << std::endl;
-
-    if(this->__destroy == false)
-        this->__destroy = true;
 }
 
 template <typename U>
 inline int List<U>::get_cardinal() const
 {
     return this->__cardinal;
+}
+
+template <typename U>
+inline U *List<U>::get_elem(size_t index)
+{
+    if(index < 0 || index > this->__cardinal)
+    {
+        std::cout << "ERROR:: The index is out of the range." << std::endl;
+        return this->__first->ref_get_val();
+    }
+
+    if(this->__empty && index == 0)
+    {
+        this->push_back(U{});
+        return this->__first->ref_get_val();
+    }
+
+    if(index == this->__cardinal)
+    {
+        this->push_front(U{});
+        return this->__last->ref_get_val();
+    }
+
+    if(index == 0)
+    {
+        return this->__first->ref_get_val();
+    }
+    if(index == this->__cardinal - 1)
+    {
+        return this->__last->ref_get_val();
+    }
+
+    Element<U> *temp;
+
+    if(index < this->__cardinal / 2)
+    {
+        temp = this->__first;
+        for(int  i = 0; i < index; i++)
+            temp = temp->get_next();
+    }
+    else
+    {
+        temp = this->__last;
+        for(int i = 0; i < this->__cardinal - index - 1; i++)
+            temp = temp->get_prev();
+    }
+
+    return temp->ref_get_val();
 }
 
 template <typename U>
@@ -412,6 +501,98 @@ inline void List<U>::push_back(const U &val)
 
 template <typename U>
 inline void List<U>::push(size_t index, const U &val)
+{
+    if(index < 0 || index > this->__cardinal)
+    {
+        std::cout << "ERROR:: The index is out of the range." << std::endl;
+        return;
+    }
+
+    if(index == 0)
+    {
+        this->push_front(val);
+        return;
+    }
+    if(index == this->__cardinal)
+    {
+        this->push_back(val);
+        return;
+    }
+
+    Element<U> *temp;
+    Element<U> *elem = new Element<U>{val};
+
+    if(index < this->__cardinal / 2)
+    {
+        temp = this->__first;
+        for(int  i = 0; i < index; i++)
+            temp = temp->get_next();
+    }
+    else
+    {
+        temp = this->__last;
+        for(int i = 0; i < this->__cardinal - index - 1; i++)
+            temp = temp->get_prev();
+    }
+
+    elem->set_next(temp);
+    elem->set_prev(temp->get_prev());
+    (temp->get_prev())->set_next(elem);
+    temp->set_prev(elem);
+
+    this->__cardinal++;
+}
+
+template <typename U>
+inline void List<U>::ref_push_front(U *val)
+{
+    Element<U> *temp = new Element<U>{val};
+
+    if(this->__empty)
+    {
+        this->__empty = false;
+
+        this->__first = temp;
+        this->__last = temp;
+
+        this->__cardinal++;
+
+        return;
+    }
+
+    temp->set_next(this->__first);
+    this->__first->set_prev(temp);
+    this->__first = temp;
+
+    this->__cardinal++;
+}
+
+template <typename U>
+inline void List<U>::ref_push_back(U *val)
+{
+    Element<U> *temp = new Element<U>{val};
+
+    if(this->__empty)
+    {
+        this->__empty = false;
+
+        this->__first = temp;
+        this->__last = temp;
+
+        this->__cardinal++;
+
+        return;
+    }
+
+    temp->set_prev(this->__last);
+    this->__last->set_next(temp);
+    this->__last = temp;
+
+    this->__cardinal++;
+}
+
+template <typename U>
+inline void List<U>::ref_push(size_t index, U *val)
 {
     if(index < 0 || index > this->__cardinal)
     {
@@ -574,6 +755,18 @@ inline void List<U>::operator=(const List<U> &other)
 template <typename U>
 inline void List<U>::operator=(std::initializer_list<U> list)
 {
+    if(list.size() == this->get_cardinal())
+    {
+        int i = 0;
+        for(auto &elem : list)
+        {
+            *this->get_elem(i) = elem;
+            i++;
+        }
+
+        return;
+    }
+
     this->clear();
 
     for(auto &elem : list)
@@ -587,6 +780,18 @@ inline U &List<U>::operator[](size_t index)
     {
         std::cout << "ERROR:: The index is out of the range." << std::endl;
         return this->__first->get_ref_val();
+    }
+
+    if(this->__empty && index == 0)
+    {
+        this->push_back(U{});
+        return this->__first->get_ref_val();
+    }
+
+    if(index == this->__cardinal)
+    {
+        this->push_front(U{});
+        return this->__last->get_ref_val();
     }
 
     if(index == 0)

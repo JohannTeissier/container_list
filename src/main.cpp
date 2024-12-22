@@ -4,35 +4,23 @@
 
 int main()
 {
-    pw::Matrix<int> m1{
+    pw::Matrix<int> m{{
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9}
-    };
+    }};
 
-    for(auto &elem : m1.get_matrix())
+    m[0] = {10, 10, 10};
+
+    for(auto &elem : m[":"])
         std::cout << elem << std::endl;
 
-    std::cout << "--------------------------------------" << std::endl;
+    m[":"][1] = {-20, -20, -20};
 
-    pw::Matrix<int> m2{m1};
+    std::cout << "\n\n";
 
-    for(auto &elem : m2.get_matrix())
+    for(auto &elem : m.get_matrix())
         std::cout << elem << std::endl;
-
-    std::cout << "--------------------------------------" << std::endl;
-
-    m1.get_matrix()[0][0] = 548;
-
-    for(auto &elem : m2.get_matrix())
-        std::cout << elem << std::endl;
-
-    std::cout << "--------------------------------------" << std::endl;
-
-    for(auto &elem : m1.get_matrix())
-        std::cout << elem << std::endl;
-
-    std::cout << "--------------------------------------" << std::endl;
 
     return 0;
 }

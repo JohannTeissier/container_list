@@ -12,11 +12,11 @@ class Element
 {
 public:
 
-    void print_value() const;
-
     /*------------------ Constructor ------------------*/
+    // Element() = default;
     Element(const T &val, Element<T>* next = nullptr, Element<T>* prev = nullptr);
     Element(const Element<T>& elem);
+    Element(T* val);
 
     /*------------------ Destructor ------------------*/
     ~Element();
@@ -24,13 +24,17 @@ public:
 
     /*------------------ Getter ------------------*/
     T &get_ref_val();
-    T get_copy_val() const;
+    T get_copy_val();
+    T *ref_get_val();
     Element<T>* get_prev() const;
     Element<T>* get_next() const;
     Element<T>* data() const;
 
     /*------------------ Setter ------------------*/
     void set_value(const T val);
+    void set_ref(T *val);
+    void free_ref(T val);
+    void free_ref(T *val);
     void set_prev(Element<T>* prev);
     void set_next(Element<T>* next);
 
@@ -66,21 +70,23 @@ public:
     bool operator ||(const Element<T> &elem);
     bool operator ||(const T val);
 
-    operator T() const;
+    operator T();
 
     friend std::ostream& operator <<(std::ostream& os, Element<T>& elem)
     {
-        os << elem.__value;
+        os << *elem.__p_val;
+
         return os;
     }
 
 private:
 
-    T __value;
+    T *__p_val = nullptr;
     Element* __pnext = nullptr;
     Element* __pprev = nullptr;
 
     bool __destroy = true;
+    bool __is_ref = false;
 };
 
 template<typename U>
@@ -101,10 +107,16 @@ public:
     /*------------ Getter ------------*/
     int get_cardinal() const;
 
+    U *get_elem(size_t index);
+
     /*------------ Push functions ------------*/
     void push_front(const U &val);
     void push_back(const U &val);
     void push(size_t index, const U &val);
+
+    void ref_push_front(U *val);
+    void ref_push_back(U *val);
+    void ref_push(size_t index, U *val);
 
     /*------------ Pop functions ------------*/
     void pop_front();
