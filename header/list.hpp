@@ -30,7 +30,7 @@ template <typename T>
 inline Element<T>::~Element()
 {
     // if(this->__destroy)
-        // std::cout << "Object deleted." << std::endl;
+    //     std::cout << "Object deleted." << std::endl;
 }
 
 template <typename T>
@@ -334,7 +334,7 @@ template <typename U>
 inline List<U>::List(std::initializer_list<U> list)
 {
     for(auto &elem : list)
-        push_back(elem);
+        this->push_back(elem);
 }
 
 template <typename U>

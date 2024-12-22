@@ -137,6 +137,30 @@ public:
         return os;
     }
 
+    class Iterator {
+    private:
+        Element<U>* current; // Pointeur sur l'élément actuel
+    public:
+        // Constructeur
+        Iterator(Element<U>* ptr) : current(ptr) {}
+
+        // Opérateur déréférencement
+        U& operator*() { return current->get_ref_val(); }
+
+        // Opérateur de comparaison
+        bool operator!=(const Iterator& other) const { return current != other.current; }
+
+        // Opérateur d'incrémentation
+        Iterator& operator++() {
+            this->current = this->current->get_next();
+            return *this;
+        }
+    };
+
+    // Méthodes begin() et end()
+    Iterator begin() { return Iterator(this->__first); }
+    Iterator end() { return Iterator(nullptr); }
+
 private:
 
     Element<U>* __first = nullptr;
