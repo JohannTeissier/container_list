@@ -18,10 +18,19 @@ public:
 
     void operator =(const Matrix<M> &other);
     void operator =(std::initializer_list<List<M>> list);
-    List<M> &operator [](size_t index);
-    List<List<M>> &operator [](const std::string c);
+    void operator =(const M val);
+    Matrix<M> operator [](size_t index);
+    Matrix<M> operator [](const std::string c);
 
     List<List<M>>& get_matrix();
+
+    friend std::ostream& operator <<(std::ostream& os, Matrix<M>& m)
+    {
+        for(auto &elem : m.__m)
+            os << elem << "\n";
+
+        return os;
+    }
 
 private:
 

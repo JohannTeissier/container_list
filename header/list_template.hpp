@@ -114,6 +114,8 @@ public:
     void push_back(const U &val);
     void push(size_t index, const U &val);
 
+    void ref_copy(List<U> *l);
+
     void ref_push_front(U *val);
     void ref_push_back(U *val);
     void ref_push(size_t index, U *val);

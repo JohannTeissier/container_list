@@ -1,26 +1,25 @@
 #include <iostream>
 
+#include "vector.hpp"
 #include "matrix.hpp"
 
 int main()
 {
-    pw::Matrix<int> m{{
+    // pw::Vector<int> v{{1, 2, 3, 4, 5, 6}};
+
+    // pw::Vector<int> v2;
+
+    // v2 = {5, 5, 5, 5};
+
+    // std::cout << v2.get_list() << std::endl;
+
+    pw::Matrix<int> m = {
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9}
-    }};
+    };
 
-    m[0] = {10, 10, 10};
-
-    for(auto &elem : m[":"])
-        std::cout << elem << std::endl;
-
-    m[":"][1] = {-20, -20, -20};
-
-    std::cout << "\n\n";
-
-    for(auto &elem : m.get_matrix())
-        std::cout << elem << std::endl;
+    m[1] = {0, 0, 0};
 
     return 0;
 }

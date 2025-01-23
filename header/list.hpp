@@ -26,6 +26,8 @@ template <typename T>
 inline Element<T>::Element(T *val)
 {
     this->__p_val = val;
+    this->__pprev = nullptr;
+    this->__pnext = nullptr;
     this->__is_ref = true;
 }
 
@@ -34,7 +36,7 @@ inline Element<T>::~Element()
 {
     if(this->__destroy && !this->__is_ref)
     {
-        //std::cout << "Object deleted." << std::endl;
+        // std::cout << "Object deleted." << std::endl;
         if(this->__p_val != nullptr)
             delete this->__p_val;
     }
@@ -369,7 +371,7 @@ inline List<U>::List(const List<U> &l)
 
     while(temp != nullptr)
     {
-        this->push_front(temp->get_copy_val());
+        this->push_front(temp->get_ref_val());
         temp = temp->get_prev();
     }
 
@@ -544,6 +546,23 @@ inline void List<U>::push(size_t index, const U &val)
 }
 
 template <typename U>
+inline void List<U>::ref_copy(List<U> *l)
+{
+    if(this->__last != nullptr && this->__first != nullptr)
+        this->clear();
+
+    Element<U> *temp = l->__last;
+
+    while(temp != nullptr)
+    {
+        this->ref_push_front(&(temp->get_ref_val()));
+        temp = temp->get_prev();
+    }
+
+    this->__destroy = false;
+}
+
+template <typename U>
 inline void List<U>::ref_push_front(U *val)
 {
     Element<U> *temp = new Element<U>{val};
@@ -602,12 +621,12 @@ inline void List<U>::ref_push(size_t index, U *val)
 
     if(index == 0)
     {
-        this->push_front(val);
+        this->ref_push_front(val);
         return;
     }
     if(index == this->__cardinal)
     {
-        this->push_back(val);
+        this->ref_push_back(val);
         return;
     }
 
@@ -784,13 +803,13 @@ inline U &List<U>::operator[](size_t index)
 
     if(this->__empty && index == 0)
     {
-        this->push_back(U{});
+        this->push_front(U{});
         return this->__first->get_ref_val();
     }
 
     if(index == this->__cardinal)
     {
-        this->push_front(U{});
+        this->push_back(U{});
         return this->__last->get_ref_val();
     }
 

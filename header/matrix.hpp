@@ -41,7 +41,18 @@ inline Matrix<M>::Matrix(std::initializer_list<List<M>> list)
 template <typename M>
 inline void Matrix<M>::operator=(const Matrix<M> &other)
 {
+    if(!this->__empty)
+    {
+        if(this->__width != other.__width || this->__height != other.__height)
+            return;
+
+        this->__m.clear();
+        this->__mt.clear();
+    }
+
     this->__m = other.__m;
+    this->__width = other.__width;
+    this->__height = other.__height;
     this->__empty = false;
     this->same_transpose();
 }
@@ -74,18 +85,32 @@ inline void Matrix<M>::operator=(std::initializer_list<List<M>> list)
 }
 
 template <typename M>
-inline List<M> &Matrix<M>::operator[](size_t index)
+inline void Matrix<M>::operator=(const M val)
 {
-    if(index < 0 || index >= this->__width)
-        return this->__m[0];
-
-    return this->__m[index];
+    if(this->__width == 0 && this->__height == 0)
+        this->__m[0][0] = val;
 }
 
 template <typename M>
-inline List<List<M>> &Matrix<M>::operator[](const std::string c)
+inline Matrix<M> Matrix<M>::operator[](size_t index)
 {
-    return this->__mt;
+    Matrix<M> temp;
+
+    if(index < 0 || index >= this->__width)
+        temp.__m.ref_push_back(&(this->__m[0]));
+    else
+        temp.__m.ref_push_back(&(this->__m[index]));
+
+    return temp;
+}
+
+template <typename M>
+inline Matrix<M> Matrix<M>::operator[](const std::string c)
+{
+    Matrix<M> temp;
+    temp.__m.ref_copy(&(this->__mt));
+
+    return temp;
 }
 
 template <typename M>
